@@ -18,10 +18,9 @@ function Sidebar() {
     };
 
     return (
-        <aside className='w-[25%] h-dvh flex flex-col items-center px-7 shadow'>
-            <div className='my-7 flex items-center'>
-           <h1 className='text-3xl text-primary mr-2'>Admin X</h1>
-           <ModeToggle />
+        <aside className='w-[25%] h-dvh flex flex-col items-center px-7  shadow relative'>
+            <div className='my-7'>
+                <h1 className='text-3xl text-primary font-semibold mr-2'>Admin <span className='text-6xl'>X</span></h1>
             </div>
             <Separator />
             <ul className='my-7 space-y-4 w-full'>
@@ -58,6 +57,9 @@ function Sidebar() {
                     })
                 }
             </ul>
+            <div className='absolute bottom-4 left-7'>
+                <ModeToggle />
+            </div>
         </aside>
 
     );
