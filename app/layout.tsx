@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/ui/theme-provider"
 import "./globals.css";
 
 import SideBar from "@/components/_ui/Sidebar"
+import Header from "@/components/_ui/Header"
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -27,8 +28,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SideBar />
-          <main className="container">
-            {children}
+
+          <main className="w-full" >
+            <Header />
+            <div className="container">
+              {children}
+            </div>
           </main>
         </ThemeProvider>
 
