@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/ui/theme-provider"
 import "./globals.css";
 
 import SideBar from "@/components/_ui/Sidebar"
@@ -19,11 +20,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} flex`}>
-        <SideBar/>
-        
-        {children}
-      
-        </body>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <SideBar />
+          {children}
+        </ThemeProvider>
+
+      </body>
+
     </html>
   );
 }
