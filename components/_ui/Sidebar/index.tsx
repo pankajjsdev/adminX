@@ -8,7 +8,6 @@ import { GoChevronRight, } from "react-icons/go";
 import { ModeToggle } from '@/components/ui/theme-controll'
 import { usePathname } from 'next/navigation'
 
-
 function Sidebar() {
     const [showSubMenu, setShowSubMenu] = useState<number | null>(null);
     const pathname = usePathname()
@@ -57,6 +56,7 @@ function Sidebar() {
                     })
                 }
             </ul>
+            <Separator />
             <div className='absolute bottom-4 left-7'>
                 <ModeToggle />
             </div>

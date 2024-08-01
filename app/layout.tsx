@@ -27,7 +27,9 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SideBar />
-          {children}
+          <main className="container">
+            {children}
+          </main>
         </ThemeProvider>
 
       </body>
