@@ -4,6 +4,7 @@ import ImageUpload from "@/components/_ui/common/ImageUpload";
 import Layout from "@/components/_ui/common/Layout";
 import PageHeading from "@/components/_ui/common/PageHeading";
 import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -34,6 +35,7 @@ const fieldsInfo: FieldInfo[] = [
     { name: 'Short description', type: 2, isRequired: true, keyName: 'shortDescription' },
     { name: 'Listen Link', type: 1, isRequired: false, keyName: 'listenLink' },
     { name: 'Description', type: 2, isRequired: true, keyName: 'description' },
+    { name: 'Ads media url', type: 1, isRequired: false, keyName: 'adsMedia' },
 ];
 
 // Define the type for form values based on FieldInfo key names
@@ -57,18 +59,13 @@ function Page() {
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         const formData = new FormData(e.currentTarget)
-        console.log('Form submitted:', {formValues, formData});
+        console.log('Form submitted:', { formValues, formData });
     };
 
     return (
         <Layout>
             <TypographyH3 title="Add New Episode" />
-
-            <form className="relative" onSubmit={handleSubmit}>
-                <div className='absolute right-0 -top-16 space-x-4'>
-                    <Button type="submit" className='px-7'>Submit</Button>
-                    <Link href={'/'} className='py-3 px-7 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90'>Cancel</Link>
-                </div>
+            <form className="" onSubmit={handleSubmit}>
                 <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
                     <Card className="lg:col-span-8">
                         <CardHeader>
@@ -91,6 +88,10 @@ function Page() {
                         </CardContent>
                     </Card>
                     <div className="lg:col-span-4 space-y-6">
+                        <SelectCard title="Select Type" description="Choose free/paid">
+                            <SelectItem value="next">Free</SelectItem>
+                            <SelectItem value="sveltekit">Paid</SelectItem>
+                        </SelectCard>
                         <SelectCard title="Select Category" description="Choose a category">
                             <SelectItem value="next">Next.js</SelectItem>
                             <SelectItem value="sveltekit">SvelteKit</SelectItem>
@@ -104,7 +105,15 @@ function Page() {
                             <SelectItem value="nuxt">Nuxt.js</SelectItem>
                         </SelectCard>
                     </div>
-
+                </div>
+                <div className='my-7 flex justify-between space-x-4 lg:justify-end'>
+                    <Button type="submit" className='py-3 px-7'>Submit
+                        {/* <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Please wait */}
+                    </Button>
+                    <Button asChild>
+                        <Link href="/login">Cancel</Link>
+                    </Button>
                 </div>
 
             </form>
