@@ -49,6 +49,7 @@ export default function App() {
           />
           <HistoryPlugin />
           <AutoFocusPlugin />
+          <TreeViewPlugin />
         </div>
       </div>
     </LexicalComposer>

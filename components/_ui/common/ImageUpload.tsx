@@ -1,9 +1,13 @@
-'use client'
+'use client';
 
 import { Trash2, Upload } from "lucide-react";
-import { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-function ImageUpload() {
+type PageProps = {
+    setImageToparent: (images: File[]) => void;
+};
+
+function ImageUpload({ setImageToparent }: PageProps) {
     const ref = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = useState<File[]>([]);
 
@@ -22,9 +26,13 @@ function ImageUpload() {
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
     };
 
+    useEffect(() => {
+        setImageToparent(images);
+    }, [images, setImageToparent]);
+
     return (
         <div>
-             <label className="capitalize">Upload Media</label>
+            <label className="capitalize">Upload Media</label>
             <div className="flex flex-wrap mt-4">
                 {images.map((image, index) => (
                     <div key={index} className="relative m-2">
@@ -39,7 +47,6 @@ function ImageUpload() {
                             onClick={() => handleDeleteImage(index)}
                         >
                             <Trash2 size={16} className="text-red-500" />
-
                         </button>
                     </div>
                 ))}

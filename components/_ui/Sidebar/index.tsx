@@ -17,7 +17,7 @@ function Sidebar() {
     };
 
     return (
-        <aside className='w-[25%] h-dvh flex flex-col items-center px-7  shadow-xl relative hidden'>
+        <aside className='w-[25%] h-dvh hidden lg:flex flex-col items-center px-7  shadow-xl relative'>
             <div className='my-7'>
                 <h1 className='text-3xl text-primary font-semibold mr-2'>Admin <span className='text-6xl'>X</span></h1>
             </div>
