@@ -10,16 +10,23 @@ import { usePathname } from 'next/navigation'
 
 function Sidebar() {
     const [showSubMenu, setShowSubMenu] = useState<number | null>(null);
+    const [isMenuMin, setMenuMin] = useState<boolean>(false);
     const pathname = usePathname()
 
     const handleToggle = (index: number) => {
+        if(!isMenuMin)
         setShowSubMenu(showSubMenu === index ? null : index);
     };
+    
+
+    const handleSideBar = ()=>{
+        setMenuMin(!isMenuMin)
+    }
 
     return (
-        <aside className='w-[25%] h-dvh hidden lg:flex flex-col items-center px-7  shadow-xl relative'>
+        <aside className={`${isMenuMin ? 'w-[5%] ' : 'w-[25%] px-7 '} transition-all duration-500 ease-in-out h-dvh hidden lg:flex flex-col items-center  shadow-xl relative`}>
             <div className='my-7'>
-                <h1 className='text-3xl text-primary font-semibold mr-2'>Admin <span className='text-6xl'>X</span></h1>
+                <h1 className='text-3xl text-primary font-semibold mr-2 '>{isMenuMin ? '' : 'Admin'} <span onClick={handleSideBar} className='text-6xl cursor-pointer'>X</span></h1>
             </div>
             <Separator />
             <ul className='my-7 space-y-4 w-full'>
@@ -31,13 +38,13 @@ function Sidebar() {
                                 <div className={`flex items-center justify-between transition-all duration-500 ease-in-out w-full text-left cursor-pointer group hover:bg-secondary rounded-md p-2 ${isPathActive ? 'bg-secondary' : ''}`} onClick={() => handleToggle(index)} >
                                     <div className='flex items-center'>
                                         <link.icon size={20} className='mx-2 text-primary' />
-                                        <Link href={link.path} className='ml-2 text-primary'>
+                                       {!isMenuMin && <Link href={link.path} className='ml-2 text-primary'>
                                             {link.title}
-                                        </Link>
+                                        </Link>}
                                     </div>
-                                    <GoChevronRight
+                                   {!isMenuMin && <GoChevronRight
                                         className={`transition-all duration-500 ease-in-out ${showSubMenu === index ? 'rotate-90' : ''}`}
-                                    />
+                                    />}
                                 </div>
                                 <ul className={`overflow-hidden space-y-2 transition-all duration-500 ease-in-out ${showSubMenu === index ? 'max-h-40 mt-4' : 'max-h-0'}`}>
                                     {link.subMenus.map((subLink, subIndex) => {
