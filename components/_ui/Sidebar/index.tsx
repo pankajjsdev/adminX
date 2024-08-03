@@ -24,7 +24,7 @@ function Sidebar() {
     }
 
     return (
-        <aside className={`${isMenuMin ? 'w-[5%] ' : 'w-[25%] px-7 '} transition-all duration-500 ease-in-out h-dvh hidden lg:flex flex-col items-center  shadow-xl relative`}>
+        <aside className={`${isMenuMin ? 'w-[5%] ' : 'w-[25%] px-7 '} transition-all duration-5=00 ease-in-out h-dvh hidden lg:flex flex-col items-center  shadow-xl relative`}>
             <div className='my-7'>
                 <h1 className='text-3xl text-primary font-semibold mr-2 '>{isMenuMin ? '' : 'Admin'} <span onClick={handleSideBar} className='text-6xl cursor-pointer'>X</span></h1>
             </div>

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ImageUpload from "@/components/_ui/common/ImageUpload";
 import Layout from "@/components/_ui/common/Layout";
 import { Button } from "@/components/ui/button";
@@ -74,6 +74,11 @@ function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        fetch('/api/episodes',{
+            method:'POST',
+            body:JSON.stringify({title:'test data', description:'this is meta description'})
+        })
         
         // Create a FormData object from the form
         const formData = new FormData(e.currentTarget);
