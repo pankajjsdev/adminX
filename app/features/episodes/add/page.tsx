@@ -21,6 +21,8 @@ import {
 import { FormField } from '@/components/_ui/common/FormField';
 import { TypographyH3 } from '@/components/_ui/common/Typography';
 import { Input } from '@/components/ui/input';
+import apiFetch from '@/lib/Services';
+import { END_POINTS } from '@/lib/Endpoints';
 
 interface FieldInfo {
     name: string;
@@ -29,6 +31,13 @@ interface FieldInfo {
     keyName: string;
     fieldType?: string;
 }
+
+interface ApiResponse {
+    success: boolean;
+    message?: string;
+    data?: any; // Adjust this type based on your API response structure
+}
+
 
 const fieldsInfo: FieldInfo[] = [
     { name: 'Episode Name', fieldType: 'text', type: 1, isRequired: true, keyName: 'title' },
@@ -74,54 +83,57 @@ function Page() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        fetch('/api/episodes',{
-            method:'POST',
-            body:JSON.stringify({title:'test data', description:'this is meta description'})
-        })
         
         // Create a FormData object from the form
-        const formData = new FormData(e.currentTarget);
-        
-        // Convert FormData to JSON
-        const formDataJson = Object.fromEntries(formData.entries());
+        const formData = new FormData();
+        console.log("Form Data Entries:");
 
-
-        console.log("formDataJson", formDataJson)
-        
-        // Combine formDataJson with other state data
-        const requestData = {
-            ...formDataJson,
-            images, // Add images if necessary
-            status,
-            type,
-            amount,
-            currency
-        };
-        
+        fieldsInfo.forEach((value, key) => {
+            formData.append(value.keyName, formValues[value.keyName]);
+        });
+    
+        // Add additional variables to FormData
+        formData.append('images', JSON.stringify(images)); // Ensure images are correctly serialized if they are not already strings
+        formData.append('status', status);
+        formData.append('type', type);
+        formData.append('amount', amount.toString()); // Convert to string if necessary
+        formData.append('currency', currency);
+    
+        // Log the combined FormData
+        console.log("Form Data for Submission:");
+        formData.forEach((value, key) => {
+            console.log(`${key}: ${value}`);
+        });
+    
         try {
-            const response = await fetch('/api/endpoint', { // Replace with your API endpoint
+            // Send a POST request with FormData payload
+            const response: Response = await apiFetch(END_POINTS.EPISODS, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(requestData)
+                body: formData // No need to set Content-Type header as FormData will set it automatically
             });
-            
+    
+            // Check if response is ok
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            
-            const result = await response.json();
+    
+            // Assume the response is JSON and define its type
+            const result: ApiResponse = await response.json();
             console.log('Success:', result);
-            
-            // Redirect or show success message
-            router.push('/success-page'); // Replace with your success route
+    
+            // Redirect or handle success
+            router.back(); // Redirect back or handle as needed
         } catch (error) {
-            console.error('Error:', error);
+            // Check if error is of type Error
+            if (error instanceof Error) {
+                console.error('Error:', error.message);
+            } else {
+                console.error('Unexpected error:', error);
+            }
         }
     };
     
+
     const handleTypeChange = (value: string) => {
         setType(value);
     };
@@ -229,7 +241,7 @@ function Page() {
                                 </SelectContent>
                             </Select>
                         </SelectCard>
-                       
+
                     </div>
                 </div>
                 <div className='my-7 flex justify-between space-x-4 lg:justify-end'>
