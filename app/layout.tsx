@@ -3,6 +3,10 @@ import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ui/theme-provider"
 import "./globals.css";
 
+import { NextSSRPlugin } from "@uploadthing/react/next-ssr-plugin";
+import { extractRouterConfig } from "uploadthing/server";
+import { ourFileRouter } from "@/app/api/uploadthing/core";
+
 import SideBar from "@/components/_ui/Sidebar"
 import Header from "@/components/_ui/Header"
 
@@ -32,6 +36,9 @@ export default function RootLayout({
           <main className="w-full" >
             <Header />
             <div className="container">
+              <NextSSRPlugin
+                routerConfig={extractRouterConfig(ourFileRouter)}
+              />
               {children}
             </div>
           </main>

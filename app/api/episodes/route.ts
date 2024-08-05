@@ -1,24 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { connectDB } from '../db';
-import EpisodeSchema from './schema';
+import EpisodeModel from './schema';
 
-connectDB();
+
 
 export async function GET(request: NextRequest) {
-    return NextResponse.json({ message: 'Hello, World!', cc: request.cookies });
+     connectDB();
+    const result = await EpisodeModel.find();
+    return NextResponse.json({ data:result });
 }
 
 
 
 export async function POST(request: NextRequest) {
     try {
-        const body = await request.json(); // Parse the JSON body
-        const { title, description }: { title: string; description: string } = body; // Destructure from body
+        connectDB();
+         const json = await request.json()
+         const {title, description} = json
+       
+        console.log("bodybody=>>>>", json);
 
-        console.log("bodybody=>>>>", { title, description });
-
-        // const schema = new EpisodeSchema({ title, description });
-        // await schema.save();
+        const schema = new EpisodeModel(json);
+        await schema.save();
 
         return NextResponse.json({ message: 'Episode saved successfully!' });
     } catch (error) {

@@ -1,5 +1,5 @@
-'use client'
-import React, { useEffect, useState } from 'react';
+'use client';
+import React, { useState } from 'react';
 import ImageUpload from "@/components/_ui/common/ImageUpload";
 import Layout from "@/components/_ui/common/Layout";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,6 @@ interface ApiResponse {
     data?: any; // Adjust this type based on your API response structure
 }
 
-
 const fieldsInfo: FieldInfo[] = [
     { name: 'Episode Name', fieldType: 'text', type: 1, isRequired: true, keyName: 'title' },
     { name: 'Short Description', fieldType: 'text', type: 2, isRequired: true, keyName: 'shortDescription' },
@@ -52,9 +51,9 @@ const fieldsInfo: FieldInfo[] = [
     { name: 'Guest Name', fieldType: 'text', type: 1, isRequired: false, keyName: 'guestName' },
     { name: 'Guest Profile', fieldType: 'url', type: 1, isRequired: false, keyName: 'guestProfile' },
     { name: 'Additional Notes', fieldType: 'textarea', type: 2, isRequired: false, keyName: 'notes' },
+    { name: 'Cover Image', fieldType: 'url', type: 1, isRequired: false, keyName: 'coverImage' }, // New field
 ];
 
-// Define the type for form values based on FieldInfo key names
 type FormValues = {
     [key: string]: string;
 };
@@ -66,80 +65,58 @@ function Page() {
             return acc;
         }, {} as FormValues)
     );
-    const [amount, setAmount] = useState(''); // State for amount
-    const [currency, setCurrency] = useState('USD'); // State for currency
-    const [images, setImagesFromUploader] = useState();
-    const [status, setStatus] = useState('draft'); // New state for status
+    const [amount, setAmount] = useState('');
+    const [currency, setCurrency] = useState('USD');
+    const [images, setImagesFromUploader] = useState<string[]>([]); // Ensure images is an array of strings
+    const [status, setStatus] = useState('draft');
     const [type, setType] = useState('free');
+    const [coverImage, setCoverImage] = useState(); // For the cover image
     const router = useRouter();
 
     const handleChange = (key: string, value: string) => {
         setFormValues({ ...formValues, [key]: value });
     };
 
-    const handleStatusChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-        setStatus(e.target.value);
-    };
-
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        
-        // Create a FormData object from the form
-        const formData = new FormData();
-        console.log("Form Data Entries:");
 
-        fieldsInfo.forEach((value, key) => {
-            formData.append(value.keyName, formValues[value.keyName]);
-        });
-    
-        // Add additional variables to FormData
-        formData.append('images', JSON.stringify(images)); // Ensure images are correctly serialized if they are not already strings
-        formData.append('status', status);
-        formData.append('type', type);
-        formData.append('amount', amount.toString()); // Convert to string if necessary
-        formData.append('currency', currency);
-    
-        // Log the combined FormData
-        console.log("Form Data for Submission:");
-        formData.forEach((value, key) => {
-            console.log(`${key}: ${value}`);
-        });
-    
+        // Construct the payload as a plain object
+        const payload = {
+            ...formValues,
+            images: images, // Assuming images is an array of strings
+            coverImage: coverImage,
+            status: status,
+            type: type,
+            amount: amount,
+            currency: currency,
+        };
+
+        console.log("Payload:", payload);
+
         try {
-            // Send a POST request with FormData payload
             const response: Response = await apiFetch(END_POINTS.EPISODS, {
                 method: 'POST',
-                body: formData // No need to set Content-Type header as FormData will set it automatically
+                body: JSON.stringify(payload), // Use the payload here
             });
-    
-            // Check if response is ok
+
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-    
-            // Assume the response is JSON and define its type
+
             const result: ApiResponse = await response.json();
             console.log('Success:', result);
-    
-            // Redirect or handle success
-            router.back(); // Redirect back or handle as needed
+            router.back();
         } catch (error) {
-            // Check if error is of type Error
-            if (error instanceof Error) {
-                console.error('Error:', error.message);
-            } else {
-                console.error('Unexpected error:', error);
-            }
+            console.error('Error:', error instanceof Error ? error.message : 'Unexpected error');
         }
     };
-    
 
-    const handleTypeChange = (value: string) => {
-        setType(value);
+    const setImages = (images: string[]) => {
+        setImagesFromUploader(images);
     };
 
-    const setImages = (images: any) => {
-        setImagesFromUploader(images);
+    const setCoverImageFrom = (image: any) => {
+        setCoverImage(image[0]);
     };
 
     return (
@@ -162,7 +139,10 @@ function Page() {
                                         onChange={handleChange}
                                     />
                                 ))}
-                                <ImageUpload setImageToparent={setImages} />
+                                <ImageUpload 
+                                setImageToparent={setImages}
+                                 />
+                                <ImageUpload setImageToparent={setCoverImageFrom} /> {/* For the cover image */}
                             </section>
                         </CardContent>
                     </Card>
@@ -170,7 +150,7 @@ function Page() {
                         <SelectCard title="Current Status" description="Manage episode status">
                             <Select value={status} onValueChange={setStatus} required>
                                 <SelectTrigger>
-                                    <SelectValue placeholder="Select" onChange={handleStatusChange} />
+                                    <SelectValue placeholder="Select" />
                                 </SelectTrigger>
                                 <SelectContent position="popper">
                                     <SelectItem value="draft">Draft</SelectItem>
@@ -181,7 +161,7 @@ function Page() {
                             </Select>
                         </SelectCard>
                         <SelectCard title="Select Type" description="Choose free/paid">
-                            <Select value={type} onValueChange={handleTypeChange} required>
+                            <Select value={type} onValueChange={setType} required>
                                 <SelectTrigger>
                                     <SelectValue placeholder="Select" />
                                 </SelectTrigger>
@@ -241,7 +221,6 @@ function Page() {
                                 </SelectContent>
                             </Select>
                         </SelectCard>
-
                     </div>
                 </div>
                 <div className='my-7 flex justify-between space-x-4 lg:justify-end'>

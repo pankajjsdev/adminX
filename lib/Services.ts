@@ -15,7 +15,7 @@ async function apiFetch<T>(url: string, options: FetchOptions = {}): Promise<T> 
       'Content-Type': 'application/json',
       ...headers,
     },
-    body: method !== 'GET' ? JSON.stringify(body) : null,
+    body: method !== 'GET' ? body : null,
   });
 
   if (!response.ok) {

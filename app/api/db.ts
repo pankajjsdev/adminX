@@ -27,16 +27,8 @@ export const connectDB = async (): Promise<Mongoose> => {
   }
 
   if (!global.mongooseCache.promise) {
-    const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      bufferCommands: false,
-      bufferMaxEntries: 0,
-      useFindAndModify: false,
-      useCreateIndex: true,
-    };
-
-    global.mongooseCache.promise = mongoose.connect(MONGODB_URI as string, options).then((mongoose) => {
+    // No need for additional options in the latest Mongoose versions
+    global.mongooseCache.promise = mongoose.connect(MONGODB_URI as string).then((mongoose) => {
       return mongoose;
     });
   }

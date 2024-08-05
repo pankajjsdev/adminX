@@ -1,26 +1,17 @@
 'use client';
 
-import { Trash2, Upload } from "lucide-react";
+import { Trash2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
+import { UploadDropzone } from "@/lib/utils/uploadthing";
+
 type PageProps = {
-    setImageToparent: (images: File[]) => void;
+    setImageToparent: (images: string[]) => void;
 };
 
 function ImageUpload({ setImageToparent }: PageProps) {
     const ref = useRef<HTMLInputElement | null>(null);
-    const [images, setImages] = useState<File[]>([]);
-
-    const openFileBox = () => {
-        ref.current?.click();
-    };
-
-    const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = e.target.files;
-        if (files) {
-            setImages((prevImages) => [...prevImages, ...Array.from(files)]);
-        }
-    };
+    const [images, setImages] = useState<string[]>([]);
 
     const handleDeleteImage = (index: number) => {
         setImages((prevImages) => prevImages.filter((_, i) => i !== index));
@@ -37,7 +28,7 @@ function ImageUpload({ setImageToparent }: PageProps) {
                 {images.map((image, index) => (
                     <div key={index} className="relative m-2">
                         <img
-                            src={URL.createObjectURL(image)}
+                            src={`${image}`}
                             alt={`preview-${index}`}
                             className="w-32 h-32 object-cover"
                         />
@@ -50,19 +41,25 @@ function ImageUpload({ setImageToparent }: PageProps) {
                         </button>
                     </div>
                 ))}
-                <div
-                    className="w-32 h-32 m-2 border-2 border-dashed flex items-center justify-center cursor-pointer"
-                    onClick={openFileBox}
-                >
-                    <Upload size={40} />
-                    <input
-                        type="file"
-                        className="hidden"
-                        ref={ref}
-                        onChange={handleFileUpload}
-                        multiple
-                    />
-                </div>
+                <UploadDropzone
+                    endpoint="imageUploader"
+                    config={{ mode: 'auto' }}
+                    className="w-full cursor-pointer"
+                    onClientUploadComplete={(res) => {
+                        console.log("Files: ", res);
+                        setImages((prevImages) => [...prevImages, res[0].url]);
+                    }}
+                    onUploadProgress={(progress) => console.log(progress)}
+                    onUploadError={(error: Error) => {
+                        alert(`ERROR! ${error.message}`);
+                    }}
+                    onUploadBegin={(name) => {
+                        console.log("Uploading: ", name);
+                    }}
+                    onDrop={(acceptedFiles) => {
+                        console.log("Accepted files: ", acceptedFiles);
+                    }}
+                />
             </div>
         </div>
     );
