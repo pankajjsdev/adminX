@@ -7,6 +7,7 @@ import { CONTEXT_SIDEBAR } from '@/lib/Context'
 import { GoChevronRight, } from "react-icons/go";
 import { ModeToggle } from '@/components/ui/theme-controll'
 import { usePathname } from 'next/navigation'
+import { ScrollArea } from "@/components/ui/scroll-area"
 
 function Sidebar() {
     const [showSubMenu, setShowSubMenu] = useState<number | null>(null);
@@ -24,7 +25,7 @@ function Sidebar() {
     }
 
     return (
-        <aside className={`${isMenuMin ? 'w-[5%] ' : 'w-[25%] px-7 '} transition-all duration-5=00 ease-in-out h-dvh hidden lg:flex flex-col items-center  shadow-xl relative`}>
+        <aside  className={`${isMenuMin ? 'w-[5%] ' : 'w-[25%] px-7 '} relative transition-all duration-5=00 ease-in-out h-screen hidden lg:flex flex-col items-center  shadow-xl`}>
             <div className='my-7'>
                 <h1 className='text-3xl text-primary font-semibold mr-2 '>{isMenuMin ? '' : 'Admin'} <span onClick={handleSideBar} className='text-6xl cursor-pointer'>X</span></h1>
             </div>
@@ -68,7 +69,6 @@ function Sidebar() {
                 <ModeToggle />
             </div>
         </aside>
-
     );
 }
 

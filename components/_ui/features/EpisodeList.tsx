@@ -12,6 +12,7 @@ import {
     getSortedRowModel,
     useReactTable,
 } from "@tanstack/react-table"
+import { parseISO, format } from 'date-fns';
 import { ArrowUpDown, ChevronDown, MoreHorizontal } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -40,9 +41,9 @@ export type TypeProps = {
     _id: string
     title: string
     description: string
-    amount:number
+    amount: number
     status: "pending" | "processing" | "success" | "failed"
-   
+
 }
 
 export const columns: ColumnDef<TypeProps>[] = [
@@ -69,7 +70,7 @@ export const columns: ColumnDef<TypeProps>[] = [
         enableHiding: false,
     },
     {
-        id: "serialNo", 
+        id: "serialNo",
         header: 'S. no',
         cell: ({ row }) => <div>{row.index + 1}</div>,
         enableSorting: false, // Typically, serial numbers are not sortable
@@ -77,7 +78,7 @@ export const columns: ColumnDef<TypeProps>[] = [
     },
     {
         accessorKey: "title",
-        header:'Title',
+        header: 'Title',
         cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
     },
     {
@@ -95,19 +96,84 @@ export const columns: ColumnDef<TypeProps>[] = [
         },
         cell: ({ row }) => <div className="lowercase">{row.getValue("type")}</div>,
     },
+
+    // {
+    //     accessorKey: "amount",
+    //     header: () => <div className="text-right">Amount</div>,
+    //     cell: ({ row }) => {
+    //         const amount = parseFloat(row.getValue("amount"))
+
+    //         // Format the amount as a dollar amount
+    //         const formatted = new Intl.NumberFormat("en-US", {
+    //             style: "currency",
+    //             currency: "USD",
+    //         }).format(amount)
+
+    //         return <div className="text-right font-medium">{amount ? formatted : 'N/A'}</div>
+    //     },
+    // },
     {
-        accessorKey: "amount",
-        header: () => <div className="text-right">Amount</div>,
+        accessorKey: "status",
+        header: () => <div className="text-right">Status</div>,
         cell: ({ row }) => {
-            const amount = parseFloat(row.getValue("amount"))
-
-            // Format the amount as a dollar amount
-            const formatted = new Intl.NumberFormat("en-US", {
-                style: "currency",
-                currency: "USD",
-            }).format(amount)
-
-            return <div className="text-right font-medium">{amount ? formatted : 'N/A'}</div>
+            return <div className="text-right font-medium">{row.getValue("status")}</div>
+        },
+    },
+    {
+        accessorKey: "publicationDate",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Publication date
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const dateString: string = row.getValue("publicationDate")
+            const date = parseISO(dateString);
+            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy') : 'N/A'}</div>
+        },
+    },
+    {
+        accessorKey: "createdAt",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                    Created At
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const dateString: string = row.getValue("createdAt")
+            const date = parseISO(dateString);
+            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy, hh:mm:ss') : 'N/A'}</div>
+        },
+    },
+    {
+        accessorKey: "updatedAt",
+        header: ({ column }) => {
+            return (
+                <Button
+                    variant="ghost"
+                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                >
+                   Updated At
+                    <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+            )
+        },
+        cell: ({ row }) => {
+            const dateString: string = row.getValue("updatedAt")
+            const date = parseISO(dateString);
+            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy, hh:mm:ss') : 'N/A'}</div>
         },
     },
     {
@@ -132,8 +198,8 @@ export const columns: ColumnDef<TypeProps>[] = [
                             Copy TypeProps ID
                         </DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem>View customer</DropdownMenuItem>
-                        <DropdownMenuItem>View TypeProps details</DropdownMenuItem>
+                        <DropdownMenuItem>View Record details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit</DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
             )
@@ -141,7 +207,7 @@ export const columns: ColumnDef<TypeProps>[] = [
     },
 ]
 
-export function DataTableDemo({data}:{data:any}) {
+export function DataTableDemo({ data }: { data: any }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
@@ -169,8 +235,8 @@ export function DataTableDemo({data}:{data:any}) {
         },
     })
 
-React.useEffect(()=>{
-},[])
+    React.useEffect(() => {
+    }, [])
     return (
         <div className="w-full shadow-2xl border border-border  p-4 rounded-3xl">
             <div className="flex items-center py-4">
