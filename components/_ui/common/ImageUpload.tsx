@@ -4,12 +4,15 @@ import { Trash2 } from "lucide-react";
 import React, { useEffect, useRef, useState } from "react";
 
 import { UploadDropzone } from "@/lib/utils/uploadthing";
+import Image from "next/image";
 
 type PageProps = {
-    setImageToparent: (images: string[]) => void;
+    setImageToparent: (images: any) => void;
+    title: string;
+    mode: string;
 };
 
-function ImageUpload({ setImageToparent }: PageProps) {
+function ImageUpload({ setImageToparent, title, mode }: PageProps) {
     const ref = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = useState<string[]>([]);
 
@@ -18,16 +21,23 @@ function ImageUpload({ setImageToparent }: PageProps) {
     };
 
     useEffect(() => {
-        setImageToparent(images);
-    }, [images, setImageToparent]);
+        // Adjust setImageToparent based on mode
+        if (mode === 'single') {
+            setImageToparent(images[0] || '');
+        } else {
+            setImageToparent(images);
+        }
+    }, [images, mode, setImageToparent]);
 
     return (
         <div>
-            <label className="capitalize">Upload Media</label>
+            <label className="capitalize">{title}</label>
             <div className="flex flex-wrap mt-4">
                 {images.map((image, index) => (
                     <div key={index} className="relative m-2">
-                        <img
+                        <Image
+                        width={40}
+                        height={40}
                             src={`${image}`}
                             alt={`preview-${index}`}
                             className="w-32 h-32 object-cover"
@@ -47,7 +57,16 @@ function ImageUpload({ setImageToparent }: PageProps) {
                     className="w-full cursor-pointer"
                     onClientUploadComplete={(res) => {
                         console.log("Files: ", res);
-                        setImages((prevImages) => [...prevImages, res[0].url]);
+
+                        // Update images based on mode
+                        if (mode === 'single' && res.length > 0) {
+                            setImages([res[0].url]);
+                        } else {
+                            setImages((prevImages) => [
+                                ...prevImages,
+                                ...res.map((file) => file.url),
+                            ]);
+                        }
                     }}
                     onUploadProgress={(progress) => console.log(progress)}
                     onUploadError={(error: Error) => {

@@ -6,12 +6,18 @@ interface FetchOptions {
   body?: any | null;
 }
 
+const base_url = "https://adminx-api.vercel.app/api/v1"
+
 async function apiFetch<T>(url: string, options: FetchOptions = {}): Promise<T> {
   const { method = 'GET', headers = {}, body = null } = options;
 
-  const response = await fetch(url, {
+  const api_url = `${base_url}/${url}`
+
+  const response = await fetch(api_url, {
     method,
+    cache:'no-cache',
     headers: {
+      Authorization:'Basic dXNlcjpwYXNzd29yZA==',
       'Content-Type': 'application/json',
       ...headers,
     },

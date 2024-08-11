@@ -7,7 +7,7 @@ import { CiPlug1 } from "react-icons/ci";
 export const CONTEXT_SIDEBAR =  [
     {
         title: 'Dashboard',
-        path: '/dashboard',
+        path: '/dashboard/analytics',
         icon: GoHome,
         subMenus: [{
             title: 'Analytics',
@@ -17,9 +17,13 @@ export const CONTEXT_SIDEBAR =  [
     },
     {
         title: 'Features',
-        path: '/features',
+        path: '/features/episodes',
         icon: GoStar,
         subMenus: [{
+            title: 'Categories',
+            path: '/categories'
+        },
+        {
             title: 'Episodes',
             path: '/episodes'
         },

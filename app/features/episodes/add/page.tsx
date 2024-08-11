@@ -1,9 +1,11 @@
+
 'use client';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import ImageUpload from "@/components/_ui/common/ImageUpload";
 import Layout from "@/components/_ui/common/Layout";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react"
 import {
     Card,
     CardContent,
@@ -17,12 +19,25 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
+    SelectGroup
 } from "@/components/ui/select";
 import { FormField } from '@/components/_ui/common/FormField';
 import { TypographyH3 } from '@/components/_ui/common/Typography';
 import { Input } from '@/components/ui/input';
 import apiFetch from '@/lib/Services';
 import { END_POINTS } from '@/lib/Endpoints';
+import { MultiSelect } from '@/components/_ui/common/Select';
+
+
+import { Cat, Dog, Fish, Rabbit, Turtle } from "lucide-react";
+
+const frameworksList = [
+    { value: "react", label: "React", icon: Turtle },
+    { value: "angular", label: "Angular", icon: Cat },
+    { value: "vue", label: "Vue", icon: Dog },
+    { value: "svelte", label: "Svelte", icon: Rabbit },
+    { value: "ember", label: "Ember", icon: Fish },
+];
 
 interface FieldInfo {
     name: string;
@@ -51,7 +66,6 @@ const fieldsInfo: FieldInfo[] = [
     { name: 'Guest Name', fieldType: 'text', type: 1, isRequired: false, keyName: 'guestName' },
     { name: 'Guest Profile', fieldType: 'url', type: 1, isRequired: false, keyName: 'guestProfile' },
     { name: 'Additional Notes', fieldType: 'textarea', type: 2, isRequired: false, keyName: 'notes' },
-    { name: 'Cover Image', fieldType: 'url', type: 1, isRequired: false, keyName: 'coverImage' }, // New field
 ];
 
 type FormValues = {
@@ -67,11 +81,18 @@ function Page() {
     );
     const [amount, setAmount] = useState('');
     const [currency, setCurrency] = useState('USD');
-    const [images, setImagesFromUploader] = useState<string[]>([]); // Ensure images is an array of strings
+    const [categories, setCategories] = useState([]);
+    const [categoriesSelected, setCategoriesSelected] = useState<string[]>([]);
+    const [tags, setTags] = useState([]);
+    const [tagsSelected, setTagsSelected] = useState<string[]>([]);
+    const [images, setImagesFromUploader] = useState<string[]>(); // Ensure images is an array of strings
     const [status, setStatus] = useState('draft');
     const [type, setType] = useState('free');
     const [coverImage, setCoverImage] = useState(); // For the cover image
+    const [isLoading, setLoading] = useState(false)
     const router = useRouter();
+    const [selectedFrameworks, setSelectedFrameworks] = useState<string[]>(["react", "angular"]);
+
 
     const handleChange = (key: string, value: string) => {
         setFormValues({ ...formValues, [key]: value });
@@ -85,6 +106,8 @@ function Page() {
             ...formValues,
             images: images, // Assuming images is an array of strings
             coverImage: coverImage,
+            categories: categoriesSelected,
+            tags: tagsSelected,
             status: status,
             type: type,
             amount: amount,
@@ -94,20 +117,24 @@ function Page() {
         console.log("Payload:", payload);
 
         try {
-            const response: Response = await apiFetch(END_POINTS.EPISODS, {
+            setLoading(true)
+            const response: Response = await apiFetch(END_POINTS.EPISODES.CREATE, {
                 method: 'POST',
                 body: JSON.stringify(payload), // Use the payload here
             });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
+            // if (!response.ok) {
+            //     throw new Error('Network response was not ok');
+            // }
 
-            const result: ApiResponse = await response.json();
-            console.log('Success:', result);
+
+            console.log('Success:', response);
             router.back();
         } catch (error) {
             console.error('Error:', error instanceof Error ? error.message : 'Unexpected error');
+        }
+        finally {
+            setLoading(false)
         }
     };
 
@@ -115,9 +142,35 @@ function Page() {
         setImagesFromUploader(images);
     };
 
+    useEffect(() => {
+        initData()
+    }, [])
+
+    const initData = async () => {
+        try {
+            const responseCategory: any = await apiFetch(END_POINTS.CATEGORIES.LIST);
+            const categories = responseCategory?.data.list
+            setCategories(categories)
+
+            const responseTags: any = await apiFetch(END_POINTS.TAGS.LIST);
+            const tags = responseTags?.data.list
+            setTags(tags)
+        } catch (error) {
+        }
+    }
+
     const setCoverImageFrom = (image: any) => {
-        setCoverImage(image[0]);
+        setCoverImage(image);
     };
+
+    const handleMutiSelectCategory = (values: any)=>{
+        console.log("values", values)
+        setCategoriesSelected(values)
+    }
+    const handleMutiSelectTags= (values: any)=>{
+        console.log("values", values)
+        setTagsSelected(values)
+    }
 
     return (
         <Layout>
@@ -139,10 +192,18 @@ function Page() {
                                         onChange={handleChange}
                                     />
                                 ))}
-                                <ImageUpload 
-                                setImageToparent={setImages}
-                                 />
-                                <ImageUpload setImageToparent={setCoverImageFrom} /> {/* For the cover image */}
+                                <ImageUpload
+                                    title={"Cover Image"}
+                                    mode="single"
+                                    setImageToparent={setCoverImageFrom}
+                                />
+
+                                <ImageUpload
+                                    title={"Media"}
+                                    mode="multiple"
+                                    setImageToparent={setImages}
+                                />
+
                             </section>
                         </CardContent>
                     </Card>
@@ -156,7 +217,6 @@ function Page() {
                                     <SelectItem value="draft">Draft</SelectItem>
                                     <SelectItem value="active">Active</SelectItem>
                                     <SelectItem value="inactive">Inactive</SelectItem>
-                                    <SelectItem value="delete">Delete</SelectItem>
                                 </SelectContent>
                             </Select>
                         </SelectCard>
@@ -195,36 +255,42 @@ function Page() {
                             )}
                         </SelectCard>
                         <SelectCard title="Select Category" description="Choose a category">
-                            <Select required>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent position="popper">
-                                    <SelectItem value="technology">Technology</SelectItem>
-                                    <SelectItem value="lifestyle">Lifestyle</SelectItem>
-                                    <SelectItem value="health">Health</SelectItem>
-                                    <SelectItem value="business">Business</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <MultiSelect
+                                options={categories}
+                                onValueChange={setSelectedFrameworks}
+                                defaultValue={categoriesSelected}
+                       
+                                setSelectedOptions={handleMutiSelectCategory}
+                                placeholder="Select"
+                                variant="inverted"
+                                animation={2}
+                                maxCount={4}
+                            />
                         </SelectCard>
-
                         <SelectCard title="Select Tags" description="Choose tags">
-                            <Select required>
-                                <SelectTrigger>
-                                    <SelectValue placeholder="Select" />
-                                </SelectTrigger>
-                                <SelectContent position="popper">
-                                    <SelectItem value="technology">Technology</SelectItem>
-                                    <SelectItem value="lifestyle">Lifestyle</SelectItem>
-                                    <SelectItem value="education">Education</SelectItem>
-                                    <SelectItem value="entertainment">Entertainment</SelectItem>
-                                </SelectContent>
-                            </Select>
+                        <MultiSelect
+                                options={tags}
+                                onValueChange={setSelectedFrameworks}
+                                defaultValue={tagsSelected}
+                                setSelectedOptions={handleMutiSelectTags}
+                                placeholder="Select"
+                                variant="inverted"
+                                animation={2}
+                                maxCount={4}
+                            />
                         </SelectCard>
                     </div>
                 </div>
                 <div className='my-7 flex justify-between space-x-4 lg:justify-end'>
-                    <Button type="submit" className='py-3 px-7'>Submit</Button>
+                    <Button disabled={isLoading} type="submit" className='py-3 px-7'>
+                        {isLoading ? <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Please wait
+                        </>
+                            :
+                            'Submit'
+                        }
+                    </Button>
                     <Button type="button" onClick={() => router.back()}>
                         Cancel
                     </Button>

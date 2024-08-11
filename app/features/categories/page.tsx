@@ -7,15 +7,15 @@ import apiFetch from "@/lib/Services";
 
 
 const Page = async () => {
-    const response: any = await apiFetch(END_POINTS.EPISODES.LIST);
-    const episodes = response?.data.list
+    const response: any = await apiFetch(END_POINTS.CATEGORIES.LIST);
+    const categories = response?.data.list
     return (
         <Layout>
             <div className="flex items-center justify-between">
-                <PageHeading title="Episodes" />
-                <AddButton link="/features/episodes/add" />
+                <PageHeading title="Categories" />
+                <AddButton link="/features/categories/add" />
             </div>
-            <DataTableDemo data={episodes} />
+            <DataTableDemo data={categories} />
         </Layout>
     );
 };

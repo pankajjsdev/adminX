@@ -1,3 +1,14 @@
 export const END_POINTS = {
-    EPISODS:'/api/episodes'
+    TAGS:{
+        CREATE:'tags/create',
+        LIST:'tags/list'
+    },
+    CATEGORIES:{
+        CREATE:'categories/create',
+        LIST:'categories/list'
+    },
+    EPISODES:{
+        CREATE:'episodes/create',
+        LIST:'episodes/list'
+    }
 }
