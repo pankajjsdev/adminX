@@ -81,7 +81,7 @@ function Page() {
 
         try {
             setLoading(true)
-            const response: Response = await apiFetch(END_POINTS.CATEGORIES.CREATE, {
+            const response: Response = await apiFetch(END_POINTS.TAGS.CREATE, {
                 method: 'POST',
                 body: JSON.stringify(payload), // Use the payload here
             });
@@ -105,12 +105,12 @@ function Page() {
 
     return (
         <Layout>
-            <TypographyH3 title="Add New Category" />
+            <TypographyH3 title="Add New Tag" />
             <form onSubmit={handleSubmit}>
                 <div className='grid grid-cols-1 lg:grid-cols-12 gap-8'>
                     <Card className="lg:col-span-8">
                         <CardHeader>
-                            <CardTitle>Create Category</CardTitle>
+                            <CardTitle>Create Tag</CardTitle>
                             <CardDescription>Fill out the form below.</CardDescription>
                         </CardHeader>
                         <CardContent>

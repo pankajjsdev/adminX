@@ -36,189 +36,61 @@ import {
     TableRow,
 } from "@/components/ui/table"
 
-
 export type TypeProps = {
     _id: string
     title: string
     description: string
     amount: number
     status: "pending" | "processing" | "success" | "failed"
-
 }
 
-export const columns: ColumnDef<TypeProps>[] = [
-    {
-        id: "select",
-        header: ({ table }) => (
-            <Checkbox
-                checked={
-                    table.getIsAllPageRowsSelected() ||
-                    (table.getIsSomePageRowsSelected() && "indeterminate")
-                }
-                onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-                aria-label="Select all"
-            />
-        ),
-        cell: ({ row }) => (
-            <Checkbox
-                checked={row.getIsSelected()}
-                onCheckedChange={(value) => row.toggleSelected(!!value)}
-                aria-label="Select row"
-            />
-        ),
-        enableSorting: false,
-        enableHiding: false,
-    },
-    {
-        id: "serialNo",
-        header: 'S. no',
-        cell: ({ row }) => <div>{row.index + 1}</div>,
-        enableSorting: false, // Typically, serial numbers are not sortable
-        enableHiding: false,
-    },
-    {
-        accessorKey: "title",
-        header: 'Title',
-        cell: ({ row }) => <div className="lowercase">{row.getValue("title")}</div>,
-    },
-    {
-        accessorKey: "type",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Type
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => <div className="lowercase">{row.getValue("type")}</div>,
-    },
 
-    // {
-    //     accessorKey: "amount",
-    //     header: () => <div className="text-right">Amount</div>,
-    //     cell: ({ row }) => {
-    //         const amount = parseFloat(row.getValue("amount"))
-
-    //         // Format the amount as a dollar amount
-    //         const formatted = new Intl.NumberFormat("en-US", {
-    //             style: "currency",
-    //             currency: "USD",
-    //         }).format(amount)
-
-    //         return <div className="text-right font-medium">{amount ? formatted : 'N/A'}</div>
-    //     },
-    // },
-    {
-        accessorKey: "status",
-        header: () => <div className="text-right">Status</div>,
-        cell: ({ row }) => {
-            return <div className="text-right font-medium">{row.getValue("status")}</div>
-        },
-    },
-    {
-        accessorKey: "publicationDate",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Publication date
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => {
-            const dateString: string = row.getValue("publicationDate")
-            const date = parseISO(dateString);
-            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy') : 'N/A'}</div>
-        },
-    },
-    {
-        accessorKey: "createdAt",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                    Created At
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => {
-            const dateString: string = row.getValue("createdAt")
-            const date = parseISO(dateString);
-            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy, hh:mm:ss') : 'N/A'}</div>
-        },
-    },
-    {
-        accessorKey: "updatedAt",
-        header: ({ column }) => {
-            return (
-                <Button
-                    variant="ghost"
-                    onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-                >
-                   Updated At
-                    <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-            )
-        },
-        cell: ({ row }) => {
-            const dateString: string = row.getValue("updatedAt")
-            const date = parseISO(dateString);
-            return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy, hh:mm:ss') : 'N/A'}</div>
-        },
-    },
-    {
-        id: "actions",
-        enableHiding: false,
-        cell: ({ row }) => {
-            const TypeProps = row.original
-
-            return (
-                <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                        <DropdownMenuItem
-                            onClick={() => navigator.clipboard.writeText(TypeProps._id)}
-                        >
-                            Copy TypeProps ID
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem>View Record details</DropdownMenuItem>
-                        <DropdownMenuItem>Edit</DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            )
-        },
-    },
-]
-
-export function DataTableDemo({ data }: { data: any }) {
+export function DataTableDemo({ data, columnRows }: { data: any, columnRows: { title: string, type: string, accessorKey: string }[] }) {
     const [sorting, setSorting] = React.useState<SortingState>([])
-    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
-        []
-    )
-    const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({})
+    const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
+    const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
     const [rowSelection, setRowSelection] = React.useState({})
+
+    const columnsRow: ColumnDef<TypeProps>[] = columnRows.map(({ title, type, accessorKey }) => {
+        if (type === "text") {
+            return {
+                accessorKey: accessorKey,
+                header: title,
+                cell: ({ row }) => <div className="capitalize">{row.getValue(accessorKey) ? row.getValue(accessorKey) : '---'}</div>,
+            };
+        }
+        else if (type === "date") {
+            return {
+                accessorKey: accessorKey,
+                header: ({ column }) => (
+                    <Button
+                        variant="ghost"
+                        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+                    >
+                        {title}
+                        <ArrowUpDown className="ml-2 h-4 w-4" />
+                    </Button>
+                ),
+                cell: ({ row }) => {
+                    const dateString: string = row.getValue(accessorKey);
+                    const date = parseISO(dateString);
+                    return <div className="text-right font-medium">{date ? format(date, 'dd/MM/yyyy, hh:mm:ss') : 'N/A'}</div>;
+                },
+            };
+        }
+        else {
+            return {
+                accessorKey: accessorKey,
+                header: title,
+                cell: ({ row }) => <div>{row.getValue(title) ?? '---'}</div>,
+            };
+        }
+    });
+
 
     const table = useReactTable({
         data,
-        columns,
+        columns: columnsRow,
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
@@ -235,10 +107,8 @@ export function DataTableDemo({ data }: { data: any }) {
         },
     })
 
-    React.useEffect(() => {
-    }, [])
     return (
-        <div className="w-full shadow-2xl border border-border  p-4 rounded-3xl">
+        <div className="w-full shadow-2xl border border-border p-4 rounded-3xl">
             <div className="flex items-center py-4">
                 <Input
                     placeholder="Filter ..."
@@ -315,7 +185,7 @@ export function DataTableDemo({ data }: { data: any }) {
                         ) : (
                             <TableRow>
                                 <TableCell
-                                    colSpan={columns.length}
+                                    colSpan={columnsRow.length}
                                     className="h-24 text-center"
                                 >
                                     No results.
@@ -352,3 +222,4 @@ export function DataTableDemo({ data }: { data: any }) {
         </div>
     )
 }
+

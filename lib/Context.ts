@@ -24,6 +24,10 @@ export const CONTEXT_SIDEBAR =  [
             path: '/categories'
         },
         {
+            title: 'Tags',
+            path: '/tags'
+        },
+        {
             title: 'Episodes',
             path: '/episodes'
         },
